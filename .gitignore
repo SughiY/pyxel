@@ -4,3 +4,6 @@ venv/
 .DS_Store
 .lsp/
 .clj-kondo/
+*.nrepl-port
+*.cpcache/
+*.calva/
