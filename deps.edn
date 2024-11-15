@@ -1,0 +1,17 @@
+{:paths ["clojure/src" "rust/target"]
+ :aliases {:dev
+           {:classpath-overrides {org.clojure/clojure nil}
+            :extra-deps {com.github.flow-storm/clojure {:mvn/version "RELEASE"}
+                         com.github.flow-storm/flow-storm-dbg {:mvn/version "RELEASE"}}
+            :jvm-opts ["-Dclojure.storm.instrumentEnable=true"
+                       "-Dclojure.storm.instrumentOnlyPrefixes=YOUR_INSTRUMENTATION_STRING"
+                       "--enable-native-access=ALL-UNNAMED"]}
+           :run
+           {:jvm-opts ["--enable-native-access=ALL-UNNAMED"
+                       "-XstartOnFirstThread"
+                       "-XX:+UnlockDiagnosticVMOptions"
+                       "-XX:+DebugNonSafepoints"]
+            :main-opts ["-m" "hello-world"]}}
+ :deps {org.suskalo/coffi {:mvn/version "1.0.486"}
+        nrepl/nrepl {:mvn/version "1.3.0"}
+        com.apple/AppleJavaExtensions {:mvn/version "1.4"}}}
