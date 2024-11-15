@@ -1,0 +1,19 @@
+[package]
+name = "pyxel-c-wrapper"
+version = "2.2.7"
+authors = ["Takashi Kitao <takashi.kitao@gmail.com>"]
+edition = "2021"
+description = "Python extension module for Pyxel, a retro game engine for Python"
+repository = "https://github.com/kitao/pyxel"
+license = "MIT"
+keywords = ["game", "gamedev", "python"]
+categories = ["game-engines", "graphics", "multimedia"]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+pyxel-engine = { path = "../pyxel-engine", version = "2.2.7" }
+
+[target.'cfg(not(target_os = "emscripten"))'.dependencies]
+sysinfo = "0.32"
