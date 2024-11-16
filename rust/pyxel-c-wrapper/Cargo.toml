@@ -12,6 +12,9 @@ categories = ["game-engines", "graphics", "multimedia"]
 [lib]
 crate-type = ["cdylib"]
 
+[build-dependencies]
+cbindgen = "0.26"
+
 [dependencies]
 pyxel-engine = { path = "../pyxel-engine", version = "2.2.7" }
 

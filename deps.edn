@@ -1,14 +1,21 @@
-{:paths ["clojure/src" "rust/target"]
- :aliases {:dev
+{:paths ["clojure/src" "rust/target" "examples/assets"]
+ :aliases {:flow-storm
            {:classpath-overrides {org.clojure/clojure nil}
             :extra-deps {com.github.flow-storm/clojure {:mvn/version "RELEASE"}
                          com.github.flow-storm/flow-storm-dbg {:mvn/version "RELEASE"}}
             :jvm-opts ["-Dclojure.storm.instrumentEnable=true"
                        "-Dclojure.storm.instrumentOnlyPrefixes=YOUR_INSTRUMENTATION_STRING"
                        "--enable-native-access=ALL-UNNAMED"]}
+           :dev
+           {:extra-deps {net.java.dev.jna/jna {:mvn/version "5.12.1"}}
+            :jvm-opts ["-XX:+UnlockDiagnosticVMOptions"
+                       "-XX:+DebugNonSafepoints"
+                       "-Djava.library.path=/System/Library/Frameworks/CoreFoundation.framework"
+                       "--enable-native-access=ALL-UNNAMED"]}
            :run
            {:jvm-opts ["--enable-native-access=ALL-UNNAMED"
                        "-XstartOnFirstThread"
+                     ;;   "-Dclojure.server.repl={:port 5555 :accept clojure.core.server/repl}"
                        "-XX:+UnlockDiagnosticVMOptions"
                        "-XX:+DebugNonSafepoints"]
             :main-opts ["-m" "hello-world"]}}

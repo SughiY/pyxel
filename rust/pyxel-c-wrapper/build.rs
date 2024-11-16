@@ -1,3 +1,5 @@
+extern crate cbindgen;
+
 use std::env;
 use std::process::Command;
 
@@ -13,6 +15,14 @@ fn main() {
             println!("cargo:rustc-link-search={}", path);
         }
     }
+    let crate_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+
+    cbindgen::Builder::new()
+      .with_crate(crate_dir)
+      .with_language(cbindgen::Language::C)
+      .generate()
+      .expect("Unable to generate bindings")
+      .write_to_file("lib.h");
 }
 
 fn macos_link_search_path() -> Option<String> {
