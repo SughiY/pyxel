@@ -3,13 +3,13 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-typedef struct Font {
-  SharedFont inner;
-} Font;
-
 typedef struct Image {
-  SharedImage inner;
+  void* inner;
 } Image;
+
+typedef struct Font {
+  void* inner;
+} Font;
 
 int32_t pyxel_init(uint32_t width,
                    uint32_t height,
@@ -62,27 +62,27 @@ void pyxel_clip(double x, double y, double w, double h);
 
 void pyxel_clip0(void);
 
-void pyxel_line(double x1, double y1, double x2, double y2, Color col);
+void pyxel_line(double x1, double y1, double x2, double y2, uint8_t col);
 
-void pyxel_cls(Color col);
+void pyxel_cls(uint8_t col);
 
-void pyxel_circ(double x, double y, double r, Color col);
+void pyxel_circ(double x, double y, double r, uint8_t col);
 
-void pyxel_circb(double x, double y, double r, Color col);
+void pyxel_circb(double x, double y, double r, uint8_t col);
 
-void pyxel_elli(double x, double y, double w, double h, Color col);
+void pyxel_elli(double x, double y, double w, double h, uint8_t col);
 
-void pyxel_ellib(double x, double y, double w, double h, Color col);
+void pyxel_ellib(double x, double y, double w, double h, uint8_t col);
 
-void pyxel_fill(double x, double y, Color col);
+void pyxel_fill(double x, double y, uint8_t col);
 
-void pyxel_rect(double x, double y, double w, double h, Color col);
+void pyxel_rect(double x, double y, double w, double h, uint8_t col);
 
-void pyxel_rectb(double x, double y, double w, double h, Color col);
+void pyxel_rectb(double x, double y, double w, double h, uint8_t col);
 
-void pyxel_tri(double x1, double y1, double x2, double y2, double x3, double y3, Color col);
+void pyxel_tri(double x1, double y1, double x2, double y2, double x3, double y3, uint8_t col);
 
-void pyxel_trib(double x1, double y1, double x2, double y2, double x3, double y3, Color col);
+void pyxel_trib(double x1, double y1, double x2, double y2, double x3, double y3, uint8_t col);
 
 void pyxel_blt(double x,
                double y,
@@ -95,6 +95,17 @@ void pyxel_blt(double x,
                double rotate,
                double scale);
 
+void pyxel_blt_screen(double x,
+                      double y,
+                      struct Image *img_ptr,
+                      double u,
+                      double v,
+                      double w,
+                      double h,
+                      int32_t colkey,
+                      double rotate,
+                      double scale);
+
 void pyxel_bltm(double x,
                 double y,
                 uint32_t img_id,
@@ -106,7 +117,7 @@ void pyxel_bltm(double x,
                 double rotate,
                 double scale);
 
-void pyxel_text(double x, double y, const int8_t *s, Color col);
+void pyxel_text(double x, double y, const int8_t *s, uint8_t col);
 
 void pyxel_show(void);
 
@@ -123,13 +134,13 @@ void pyxel_load(const int8_t *filename,
                 bool excl_tilemaps,
                 bool excl_sounds,
                 bool excl_musics,
-                bool incl_colors,
+                bool incl_u8s,
                 bool incl_channels,
                 bool incl_tones);
 
 struct Image *image_new(uint32_t width, uint32_t height);
 
-struct Image *image_from(const int8_t *filename, bool incl_colors);
+struct Image *image_from(const int8_t *filename, bool incl_u8s);
 
 int32_t image_save(struct Image *image_ptr, const int8_t *filename, uint32_t scale);
 
@@ -149,25 +160,25 @@ void image_pal(struct Image *image_ptr, uint8_t src, uint8_t dst);
 
 void image_pal0(struct Image *image_ptr);
 
-void image_cls(struct Image *image_ptr, Color col);
+void image_cls(struct Image *image_ptr, uint8_t col);
 
 uint8_t image_pget(struct Image *image_ptr, double x, double y);
 
-void image_pset(struct Image *image_ptr, double x, double y, Color col);
+void image_pset(struct Image *image_ptr, double x, double y, uint8_t col);
 
-void image_line(struct Image *image_ptr, double x1, double y1, double x2, double y2, Color col);
+void image_line(struct Image *image_ptr, double x1, double y1, double x2, double y2, uint8_t col);
 
-void image_rect(struct Image *image_ptr, double x, double y, double w, double h, Color col);
+void image_rect(struct Image *image_ptr, double x, double y, double w, double h, uint8_t col);
 
-void image_rectb(struct Image *image_ptr, double x, double y, double w, double h, Color col);
+void image_rectb(struct Image *image_ptr, double x, double y, double w, double h, uint8_t col);
 
-void image_circ(struct Image *image_ptr, double x, double y, double r, Color col);
+void image_circ(struct Image *image_ptr, double x, double y, double r, uint8_t col);
 
-void image_circb(struct Image *image_ptr, double x, double y, double r, Color col);
+void image_circb(struct Image *image_ptr, double x, double y, double r, uint8_t col);
 
-void image_elli(struct Image *image_ptr, double x, double y, double w, double h, Color col);
+void image_elli(struct Image *image_ptr, double x, double y, double w, double h, uint8_t col);
 
-void image_ellib(struct Image *image_ptr, double x, double y, double w, double h, Color col);
+void image_ellib(struct Image *image_ptr, double x, double y, double w, double h, uint8_t col);
 
 void image_tri(struct Image *image_ptr,
                double x1,
@@ -176,7 +187,7 @@ void image_tri(struct Image *image_ptr,
                double y2,
                double x3,
                double y3,
-               Color col);
+               uint8_t col);
 
 void image_trib(struct Image *image_ptr,
                 double x1,
@@ -185,11 +196,11 @@ void image_trib(struct Image *image_ptr,
                 double y2,
                 double x3,
                 double y3,
-                Color col);
+                uint8_t col);
 
-void image_fill(struct Image *image_ptr, double x, double y, Color col);
+void image_fill(struct Image *image_ptr, double x, double y, uint8_t col);
 
-void image_text(struct Image *image_ptr, double x, double y, const int8_t *s, Color col);
+void image_text(struct Image *image_ptr, double x, double y, const int8_t *s, uint8_t col);
 
 uint8_t *image_data_ptr(struct Image *image_ptr);
 

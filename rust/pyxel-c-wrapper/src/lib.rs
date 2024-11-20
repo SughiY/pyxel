@@ -1,7 +1,8 @@
-use std::{ffi::CStr, mem::transmute};
+use std::ffi::CStr;
+use std::mem::transmute;
 use std::ptr::null_mut;
 
-use pyxel::{Color, Pyxel, PyxelCallback, Tilemap, KEY_UNKNOWN};
+use pyxel::{Pyxel, PyxelCallback, KEY_UNKNOWN};
 
 static mut PYXEL: *mut Pyxel = null_mut();
 
@@ -41,10 +42,26 @@ pub extern "C" fn pyxel_init(
             Some(unsafe { std::ffi::CStr::from_ptr(title).to_str().unwrap() })
         },
         if fps == 0 { None } else { Some(fps) },
-        if quit_key == KEY_UNKNOWN { None } else { Some(quit_key) },
-        if display_scale == 0 { None } else { Some(display_scale) },
-        if capture_scale == 0 { None } else { Some(capture_scale) },
-        if capture_sec == 0 { None } else { Some(capture_sec) },
+        if quit_key == KEY_UNKNOWN {
+            None
+        } else {
+            Some(quit_key)
+        },
+        if display_scale == 0 {
+            None
+        } else {
+            Some(display_scale)
+        },
+        if capture_scale == 0 {
+            None
+        } else {
+            Some(capture_scale)
+        },
+        if capture_sec == 0 {
+            None
+        } else {
+            Some(capture_sec)
+        },
     ));
     0
 }
@@ -96,10 +113,11 @@ pub extern "C" fn pyxel_btn(key: u32) -> bool {
 
 #[no_mangle]
 pub extern "C" fn pyxel_btnp(key: u32, hold: u32, period: u32) -> bool {
-    pyxel().btnp(key, 
-        if hold == 0 {None} else {Some(hold)} , 
-        if period == 0 {None} else {Some(period)},
-        )
+    pyxel().btnp(
+        key,
+        if hold == 0 { None } else { Some(hold) },
+        if period == 0 { None } else { Some(period) },
+    )
 }
 
 #[no_mangle]
@@ -158,57 +176,57 @@ pub extern "C" fn pyxel_clip0() {
 }
 
 #[no_mangle]
-pub extern "C" fn pyxel_line(x1: f64, y1: f64, x2: f64, y2: f64, col: Color) {
+pub extern "C" fn pyxel_line(x1: f64, y1: f64, x2: f64, y2: f64, col: u8) {
     pyxel().line(x1, y1, x2, y2, col);
 }
 
 #[no_mangle]
-pub extern "C" fn pyxel_cls(col: Color) {
+pub extern "C" fn pyxel_cls(col: u8) {
     pyxel().cls(col);
 }
 
 #[no_mangle]
-pub extern "C" fn pyxel_circ(x: f64, y: f64, r: f64, col: Color) {
+pub extern "C" fn pyxel_circ(x: f64, y: f64, r: f64, col: u8) {
     pyxel().circ(x, y, r, col);
 }
 
 #[no_mangle]
-pub extern "C" fn pyxel_circb(x: f64, y: f64, r: f64, col: Color) {
+pub extern "C" fn pyxel_circb(x: f64, y: f64, r: f64, col: u8) {
     pyxel().circb(x, y, r, col);
 }
 
 #[no_mangle]
-pub extern "C" fn pyxel_elli(x: f64, y: f64, w: f64, h: f64, col: Color) {
+pub extern "C" fn pyxel_elli(x: f64, y: f64, w: f64, h: f64, col: u8) {
     pyxel().elli(x, y, w, h, col);
 }
 
 #[no_mangle]
-pub extern "C" fn pyxel_ellib(x: f64, y: f64, w: f64, h: f64, col: Color) {
+pub extern "C" fn pyxel_ellib(x: f64, y: f64, w: f64, h: f64, col: u8) {
     pyxel().ellib(x, y, w, h, col);
 }
 
 #[no_mangle]
-pub extern "C" fn pyxel_fill(x: f64, y: f64, col: Color) {
+pub extern "C" fn pyxel_fill(x: f64, y: f64, col: u8) {
     pyxel().fill(x, y, col);
 }
 
 #[no_mangle]
-pub extern "C" fn pyxel_rect(x: f64, y: f64, w: f64, h: f64, col: Color) {
+pub extern "C" fn pyxel_rect(x: f64, y: f64, w: f64, h: f64, col: u8) {
     pyxel().rect(x, y, w, h, col);
 }
 
 #[no_mangle]
-pub extern "C" fn pyxel_rectb(x: f64, y: f64, w: f64, h: f64, col: Color) {
+pub extern "C" fn pyxel_rectb(x: f64, y: f64, w: f64, h: f64, col: u8) {
     pyxel().rectb(x, y, w, h, col);
 }
 
 #[no_mangle]
-pub extern "C" fn pyxel_tri(x1: f64, y1: f64, x2: f64, y2: f64, x3: f64, y3: f64, col: Color) {
+pub extern "C" fn pyxel_tri(x1: f64, y1: f64, x2: f64, y2: f64, x3: f64, y3: f64, col: u8) {
     pyxel().tri(x1, y1, x2, y2, x3, y3, col);
 }
 
 #[no_mangle]
-pub extern "C" fn pyxel_trib(x1: f64, y1: f64, x2: f64, y2: f64, x3: f64, y3: f64, col: Color) {
+pub extern "C" fn pyxel_trib(x1: f64, y1: f64, x2: f64, y2: f64, x3: f64, y3: f64, col: u8) {
     pyxel().trib(x1, y1, x2, y2, x3, y3, col);
 }
 
@@ -225,14 +243,47 @@ pub extern "C" fn pyxel_blt(
     rotate: f64,
     scale: f64,
 ) {
-    pyxel().blt(x, y, 
-    img_id,
-    u,
-    v, w, h, 
-    if colkey < 0 { None } else { Some(colkey as u8) },
-    if rotate == 0.0 {None} else { Some(rotate)},
-    if scale == 1.0 {None} else { Some(scale)},
-    );  
+    pyxel().blt(
+        x,
+        y,
+        img_id,
+        u,
+        v,
+        w,
+        h,
+        if colkey < 0 { None } else { Some(colkey as u8) },
+        if rotate == 0.0 { None } else { Some(rotate) },
+        if scale == 1.0 { None } else { Some(scale) },
+    );
+}
+
+#[no_mangle]
+pub extern "C" fn pyxel_blt_screen(
+    x: f64,
+    y: f64,
+    img_ptr: *mut Image,
+    u: f64,
+    v: f64,
+    w: f64,
+    h: f64,
+    colkey: i32,
+    rotate: f64,
+    scale: f64,
+) {
+    if let Some(img_ptr) = unsafe { img_ptr.as_ref() } {
+        pyxel().screen.lock().blt(
+            x,
+            y,
+            (*img_ptr).inner.clone(),
+            u,
+            v,
+            w,
+            h,
+            if colkey < 0 { None } else { Some(colkey as u8) },
+            if rotate == 0.0 { None } else { Some(rotate) },
+            if scale == 1.0 { None } else { Some(scale) },
+        );
+    }
 }
 
 #[no_mangle]
@@ -248,19 +299,29 @@ pub extern "C" fn pyxel_bltm(
     rotate: f64,
     scale: f64,
 ) {
-    pyxel().bltm(x, y, 
-    img_id,
-    u,
-    v, w, h, 
-    if colkey < 0 { None } else { Some(colkey as u8) },
-    if rotate == 0.0 {None} else { Some(rotate)},
-    if scale == 1.0 {None} else { Some(scale)},
-    );  
+    pyxel().bltm(
+        x,
+        y,
+        img_id,
+        u,
+        v,
+        w,
+        h,
+        if colkey < 0 { None } else { Some(colkey as u8) },
+        if rotate == 0.0 { None } else { Some(rotate) },
+        if scale == 1.0 { None } else { Some(scale) },
+    );
 }
 
 #[no_mangle]
-pub extern "C" fn pyxel_text(x: f64, y: f64, s: *const i8, col: Color) {
-    pyxel().text(x, y, unsafe { std::ffi::CStr::from_ptr(s).to_str().unwrap() }, col, None);
+pub extern "C" fn pyxel_text(x: f64, y: f64, s: *const i8, col: u8) {
+    pyxel().text(
+        x,
+        y,
+        unsafe { std::ffi::CStr::from_ptr(s).to_str().unwrap() },
+        col,
+        None,
+    );
 }
 
 #[no_mangle]
@@ -269,10 +330,7 @@ pub extern "C" fn pyxel_show() {
 }
 
 #[no_mangle]
-pub extern "C" fn pyxel_run(
-    update_fn: extern "C" fn(),
-    draw_fn: extern "C" fn(),
-) {
+pub extern "C" fn pyxel_run(update_fn: extern "C" fn(), draw_fn: extern "C" fn()) {
     struct CCallback {
         update: extern "C" fn(),
         draw: extern "C" fn(),
@@ -296,10 +354,12 @@ pub extern "C" fn pyxel_run(
 
 #[repr(C)]
 pub struct Font {
+    /// cbindgen:ignore
     pub(crate) inner: pyxel::SharedFont,
 }
 
 impl Font {
+    /// cbindgen:ignore
     pub fn wrap(inner: pyxel::SharedFont) -> Self {
         Self { inner }
     }
@@ -313,7 +373,7 @@ pub extern "C" fn font_new(filename: *const i8) -> *mut Font {
             return Box::into_raw(Box::new(Font {
                 inner: pyxel::Font::new(str_slice),
             }));
-        },
+        }
         Err(_) => {
             return null_mut();
         }
@@ -327,10 +387,8 @@ pub extern "C" fn font_text_width(font_ptr: *mut Font, s: *const i8) -> i32 {
     }
     let c_str = unsafe { CStr::from_ptr(s) };
     match c_str.to_str() {
-        Ok(str_slice) => {
-            unsafe {
-                return (*font_ptr).inner.lock().text_width(str_slice);
-            }
+        Ok(str_slice) => unsafe {
+            return (*font_ptr).inner.lock().text_width(str_slice);
         },
         Err(_) => {
             return -1;
@@ -354,23 +412,24 @@ pub extern "C" fn pyxel_load(
     excl_tilemaps: bool,
     excl_sounds: bool,
     excl_musics: bool,
-    incl_colors: bool,
+    incl_u8s: bool,
     incl_channels: bool,
     incl_tones: bool,
 ) {
     let c_str = unsafe { CStr::from_ptr(filename) };
     match c_str.to_str() {
         Ok(str_slice) => {
-            pyxel().load(str_slice,
+            pyxel().load(
+                str_slice,
                 Some(excl_images),
                 Some(excl_tilemaps),
                 Some(excl_sounds),
                 Some(excl_musics),
-                Some(incl_colors),
+                Some(incl_u8s),
                 Some(incl_channels),
                 Some(incl_tones),
             );
-        },
+        }
         Err(_) => {
             return;
         }
@@ -396,15 +455,13 @@ pub extern "C" fn image_new(width: u32, height: u32) -> *mut Image {
 }
 
 #[no_mangle]
-pub extern "C" fn image_from(filename: *const i8, incl_colors: bool) -> *mut Image {
+pub extern "C" fn image_from(filename: *const i8, incl_u8s: bool) -> *mut Image {
     let c_str = unsafe { CStr::from_ptr(filename) };
     match c_str.to_str() {
-        Ok(str_slice) => {
-            Box::into_raw(Box::new(Image {
-                inner: pyxel::Image::from_image(str_slice, Some(incl_colors)),
-            }))
-        },
-        Err(_) => null_mut()
+        Ok(str_slice) => Box::into_raw(Box::new(Image {
+            inner: pyxel::Image::from_image(str_slice, Some(incl_u8s)),
+        })),
+        Err(_) => null_mut(),
     }
 }
 
@@ -420,8 +477,8 @@ pub extern "C" fn image_save(image_ptr: *mut Image, filename: *const i8, scale: 
                 (*image_ptr).inner.lock().save(str_slice, scale);
             }
             0
-        },
-        Err(_) => -1
+        }
+        Err(_) => -1,
     }
 }
 
@@ -437,9 +494,7 @@ pub extern "C" fn image_free(image_ptr: *mut Image) {
 #[no_mangle]
 pub fn image_width(image_ptr: *mut Image) -> u32 {
     if !image_ptr.is_null() {
-        unsafe {
-            (*image_ptr).inner.lock().width()
-        }
+        unsafe { (*image_ptr).inner.lock().width() }
     } else {
         0
     }
@@ -448,22 +503,14 @@ pub fn image_width(image_ptr: *mut Image) -> u32 {
 #[no_mangle]
 pub fn image_height(image_ptr: *mut Image) -> u32 {
     if !image_ptr.is_null() {
-        unsafe {
-            (*image_ptr).inner.lock().height()
-        }
+        unsafe { (*image_ptr).inner.lock().height() }
     } else {
         0
     }
 }
 
 #[no_mangle]
-pub extern "C" fn image_clip(
-    image_ptr: *mut Image,
-    x: f64,
-    y: f64,
-    w: f64,
-    h: f64,
-) {
+pub extern "C" fn image_clip(image_ptr: *mut Image, x: f64, y: f64, w: f64, h: f64) {
     if !image_ptr.is_null() {
         unsafe {
             (*image_ptr).inner.lock().clip(x, y, w, h);
@@ -526,7 +573,7 @@ pub extern "C" fn image_pal0(image_ptr: *mut Image) {
 }
 
 #[no_mangle]
-pub extern "C" fn image_cls(image_ptr: *mut Image, col: Color) {
+pub extern "C" fn image_cls(image_ptr: *mut Image, col: u8) {
     if !image_ptr.is_null() {
         unsafe {
             (*image_ptr).inner.lock().cls(col);
@@ -537,16 +584,14 @@ pub extern "C" fn image_cls(image_ptr: *mut Image, col: Color) {
 #[no_mangle]
 pub extern "C" fn image_pget(image_ptr: *mut Image, x: f64, y: f64) -> u8 {
     if !image_ptr.is_null() {
-        unsafe {
-            (*image_ptr).inner.lock().pget(x, y)
-        }
+        unsafe { (*image_ptr).inner.lock().pget(x, y) }
     } else {
         0
     }
 }
 
 #[no_mangle]
-pub extern "C" fn image_pset(image_ptr: *mut Image, x: f64, y: f64, col: Color) {
+pub extern "C" fn image_pset(image_ptr: *mut Image, x: f64, y: f64, col: u8) {
     if !image_ptr.is_null() {
         unsafe {
             (*image_ptr).inner.lock().pset(x, y, col);
@@ -555,7 +600,7 @@ pub extern "C" fn image_pset(image_ptr: *mut Image, x: f64, y: f64, col: Color) 
 }
 
 #[no_mangle]
-pub extern "C" fn image_line(image_ptr: *mut Image, x1: f64, y1: f64, x2: f64, y2: f64, col: Color) {
+pub extern "C" fn image_line(image_ptr: *mut Image, x1: f64, y1: f64, x2: f64, y2: f64, col: u8) {
     if !image_ptr.is_null() {
         unsafe {
             (*image_ptr).inner.lock().line(x1, y1, x2, y2, col);
@@ -564,7 +609,7 @@ pub extern "C" fn image_line(image_ptr: *mut Image, x1: f64, y1: f64, x2: f64, y
 }
 
 #[no_mangle]
-pub extern "C" fn image_rect(image_ptr: *mut Image, x: f64, y: f64, w: f64, h: f64, col: Color) {
+pub extern "C" fn image_rect(image_ptr: *mut Image, x: f64, y: f64, w: f64, h: f64, col: u8) {
     if !image_ptr.is_null() {
         unsafe {
             (*image_ptr).inner.lock().rect(x, y, w, h, col);
@@ -572,8 +617,8 @@ pub extern "C" fn image_rect(image_ptr: *mut Image, x: f64, y: f64, w: f64, h: f
     }
 }
 
-#[no_mangle] 
-pub extern "C" fn image_rectb(image_ptr: *mut Image, x: f64, y: f64, w: f64, h: f64, col: Color) {
+#[no_mangle]
+pub extern "C" fn image_rectb(image_ptr: *mut Image, x: f64, y: f64, w: f64, h: f64, col: u8) {
     if !image_ptr.is_null() {
         unsafe {
             (*image_ptr).inner.lock().rectb(x, y, w, h, col);
@@ -582,7 +627,7 @@ pub extern "C" fn image_rectb(image_ptr: *mut Image, x: f64, y: f64, w: f64, h: 
 }
 
 #[no_mangle]
-pub extern "C" fn image_circ(image_ptr: *mut Image, x: f64, y: f64, r: f64, col: Color) {
+pub extern "C" fn image_circ(image_ptr: *mut Image, x: f64, y: f64, r: f64, col: u8) {
     if !image_ptr.is_null() {
         unsafe {
             (*image_ptr).inner.lock().circ(x, y, r, col);
@@ -591,7 +636,7 @@ pub extern "C" fn image_circ(image_ptr: *mut Image, x: f64, y: f64, r: f64, col:
 }
 
 #[no_mangle]
-pub extern "C" fn image_circb(image_ptr: *mut Image, x: f64, y: f64, r: f64, col: Color) {
+pub extern "C" fn image_circb(image_ptr: *mut Image, x: f64, y: f64, r: f64, col: u8) {
     if !image_ptr.is_null() {
         unsafe {
             (*image_ptr).inner.lock().circb(x, y, r, col);
@@ -600,7 +645,7 @@ pub extern "C" fn image_circb(image_ptr: *mut Image, x: f64, y: f64, r: f64, col
 }
 
 #[no_mangle]
-pub extern "C" fn image_elli(image_ptr: *mut Image, x: f64, y: f64, w: f64, h: f64, col: Color) {
+pub extern "C" fn image_elli(image_ptr: *mut Image, x: f64, y: f64, w: f64, h: f64, col: u8) {
     if !image_ptr.is_null() {
         unsafe {
             (*image_ptr).inner.lock().elli(x, y, w, h, col);
@@ -609,7 +654,7 @@ pub extern "C" fn image_elli(image_ptr: *mut Image, x: f64, y: f64, w: f64, h: f
 }
 
 #[no_mangle]
-pub extern "C" fn image_ellib(image_ptr: *mut Image, x: f64, y: f64, w: f64, h: f64, col: Color) {
+pub extern "C" fn image_ellib(image_ptr: *mut Image, x: f64, y: f64, w: f64, h: f64, col: u8) {
     if !image_ptr.is_null() {
         unsafe {
             (*image_ptr).inner.lock().ellib(x, y, w, h, col);
@@ -618,7 +663,16 @@ pub extern "C" fn image_ellib(image_ptr: *mut Image, x: f64, y: f64, w: f64, h: 
 }
 
 #[no_mangle]
-pub extern "C" fn image_tri(image_ptr: *mut Image, x1: f64, y1: f64, x2: f64, y2: f64, x3: f64, y3: f64, col: Color) {
+pub extern "C" fn image_tri(
+    image_ptr: *mut Image,
+    x1: f64,
+    y1: f64,
+    x2: f64,
+    y2: f64,
+    x3: f64,
+    y3: f64,
+    col: u8,
+) {
     if !image_ptr.is_null() {
         unsafe {
             (*image_ptr).inner.lock().tri(x1, y1, x2, y2, x3, y3, col);
@@ -627,7 +681,16 @@ pub extern "C" fn image_tri(image_ptr: *mut Image, x1: f64, y1: f64, x2: f64, y2
 }
 
 #[no_mangle]
-pub extern "C" fn image_trib(image_ptr: *mut Image, x1: f64, y1: f64, x2: f64, y2: f64, x3: f64, y3: f64, col: Color) {
+pub extern "C" fn image_trib(
+    image_ptr: *mut Image,
+    x1: f64,
+    y1: f64,
+    x2: f64,
+    y2: f64,
+    x3: f64,
+    y3: f64,
+    col: u8,
+) {
     if !image_ptr.is_null() {
         unsafe {
             (*image_ptr).inner.lock().trib(x1, y1, x2, y2, x3, y3, col);
@@ -636,7 +699,7 @@ pub extern "C" fn image_trib(image_ptr: *mut Image, x1: f64, y1: f64, x2: f64, y
 }
 
 #[no_mangle]
-pub extern "C" fn image_fill(image_ptr: *mut Image, x: f64, y: f64, col: Color) {
+pub extern "C" fn image_fill(image_ptr: *mut Image, x: f64, y: f64, col: u8) {
     if !image_ptr.is_null() {
         unsafe {
             (*image_ptr).inner.lock().fill(x, y, col);
@@ -645,7 +708,7 @@ pub extern "C" fn image_fill(image_ptr: *mut Image, x: f64, y: f64, col: Color) 
 }
 
 #[no_mangle]
-pub extern "C" fn image_text(image_ptr: *mut Image, x: f64, y: f64, s: *const i8, col: Color) {
+pub extern "C" fn image_text(image_ptr: *mut Image, x: f64, y: f64, s: *const i8, col: u8) {
     if !image_ptr.is_null() {
         let c_str = unsafe { CStr::from_ptr(s) };
         if let Ok(str_slice) = c_str.to_str() {
@@ -683,7 +746,7 @@ pub extern "C" fn image_blt(
     image_ptr: *mut Image,
     x: f64,
     y: f64,
-    img: *mut Image, 
+    img: *mut Image,
     u: f64,
     v: f64,
     w: f64,
@@ -695,9 +758,13 @@ pub extern "C" fn image_blt(
     if !image_ptr.is_null() {
         unsafe {
             (*image_ptr).inner.lock().blt(
-                x, y,
+                x,
+                y,
                 (*img).inner.clone(),
-                u, v, w, h,
+                u,
+                v,
+                w,
+                h,
                 if colkey < 0 { None } else { Some(colkey as u8) },
                 if rotate == 0.0 { None } else { Some(rotate) },
                 if scale == 1.0 { None } else { Some(scale) },
@@ -705,31 +772,3 @@ pub extern "C" fn image_blt(
         }
     }
 }
-
-// #[no_mangle]
-// pub extern "C" fn image_bltm(
-//     image_ptr: *mut Image,
-//     x: f64,
-//     y: f64,
-//     tm: *mut Tilemap, 
-//     u: f64,
-//     v: f64,
-//     w: f64,
-//     h: f64,
-//     colkey: i32,
-//     rotate: f64,
-//     scale: f64,
-// ) {
-//     if !image_ptr.is_null() {
-//         unsafe {
-//             (*image_ptr).inner.lock().bltm(
-//                 x, y,
-//                 (*tm).inner.clone(),
-//                 u, v, w, h,
-//                 if colkey < 0 { None } else { Some(colkey as u8) },
-//                 if rotate == 0.0 { None } else { Some(rotate) },
-//                 if scale == 1.0 { None } else { Some(scale) },
-//             );
-//         }
-//     }
-// }
