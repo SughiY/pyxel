@@ -7,3 +7,5 @@ venv/
 *.nrepl-port
 *.cpcache/
 *.calva/
+*java/
+*.vscode/
