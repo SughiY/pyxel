@@ -448,6 +448,13 @@ impl Image {
 }
 
 #[no_mangle]
+pub extern "C" fn pyxel_screen() -> *mut Image {
+    Box::into_raw(Box::new(Image {
+        inner: pyxel().screen.clone(),
+    }))
+}
+
+#[no_mangle]
 pub extern "C" fn image_new(width: u32, height: u32) -> *mut Image {
     Box::into_raw(Box::new(Image {
         inner: pyxel::Image::new(width, height),

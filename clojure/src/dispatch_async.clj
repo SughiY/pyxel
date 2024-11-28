@@ -1,25 +1,27 @@
 (ns dispatch-async
   (:require [coffi.mem :as mem]
-            [coffi.ffi :as ffi]))
+            [coffi.ffi :as ffi :refer [defcfn]]))
 
 (ffi/load-library "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation")
 
-(def get-main-queue
-  (memoize (fn get-main-queue [] (ffi/find-symbol "_dispatch_main_q"))))
+(def ^:no-doc main-class-loader @clojure.lang.Compiler/LOADER)
 
-(def dispatch_async_f
-  (memoize (fn dispatch_async_f [] (ffi/make-downcall "dispatch_async_f"
-  [::mem/pointer ::mem/pointer [::ffi/fn [::mem/pointer] ::mem/void]] ::mem/void))))
-
-(defn dispatch-async [callback]
+(defcfn dispatch_async_f
+  "dispatch_async_f"
+  [::mem/pointer ::mem/pointer ::mem/pointer] ::mem/void
+  native-fn
+  [cb]
   (let [callback-wrapper (fn callback-wrapper [_]
                            (try
-                           (callback)
+                            (.setContextClassLoader (Thread/currentThread) main-class-loader)
+                           (println "Dispatching async callback")
+                           (cb)
                             (catch Exception e
                               (println "Error in dispatch-async callback:" e))))
         upcall-ptr (mem/serialize callback-wrapper
                                   [::ffi/fn [::mem/pointer] ::mem/void]
-                                  (mem/global-arena))]
-    ((dispatch_async_f) (get-main-queue) upcall-ptr upcall-ptr)))
+                                  (mem/global-arena))
+        ]
+    (native-fn (ffi/find-symbol "_dispatch_main_q") upcall-ptr upcall-ptr)))
 
-#_(dispatch-async (fn [] (println "Hello, world!")))
+#_(dispatch_async_f (fn [] (println "Hello, world!")))
