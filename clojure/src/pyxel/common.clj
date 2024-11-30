@@ -29,67 +29,15 @@
   (width [this])
   (height [this]))
 
-;; Create a deftype for ImageType wrapping the image pointer
-(deftype ImageType [img-ptr]
-  PyxelCommon
-  (camera [this {:keys [x y]}]
-    (if x
-      (native/image_camera img-ptr x y)
-      (native/image_camera0 img-ptr)))
-  (cls [this {:keys [col]}]
-    (native/image_cls img-ptr col))
-  (line [this {:keys [x1 y1 x2 y2 col]}]
-    (native/image_line img-ptr x1 y1 x2 y2 col))
-  (rect [this {:keys [x y w h col]}]
-    (native/image_rect img-ptr x y w h col))
-  (rectb [this {:keys [x y w h col]}]
-    (native/image_rectb img-ptr x y w h col))
-  (circ [this {:keys [x y r col]}]
-    (native/image_circ img-ptr x y r col))
-  (circb [this {:keys [x y r col]}]
-    (native/image_circb img-ptr x y r col))
-  (elli [this {:keys [x y rx ry col]}]
-    (native/image_elli img-ptr x y rx ry col))
-  (ellib [this {:keys [x y rx ry col]}]
-    (native/image_ellib img-ptr x y rx ry col))
-  (tri [this {:keys [x1 y1 x2 y2 x3 y3 col]}]
-    (native/image_tri img-ptr x1 y1 x2 y2 x3 y3 col))
-  (trib [this {:keys [x1 y1 x2 y2 x3 y3 col]}]
-    (native/image_trib img-ptr x1 y1 x2 y2 x3 y3 col))
-  (fill [this {:keys [x y col]}]
-    (native/image_fill img-ptr x y col))
-  (text [this {:keys [x y text col]}]
-    (native/image_text img-ptr x y text col))
-  (blt [this {:keys [x y img src-x src-y width height colkey u v]}]
-    (native/image_blt img-ptr x y (:img-ptr img) src-x src-y width height colkey u v))
-  (pget [this {:keys [x y]}]
-    (native/image_pget img-ptr x y))
-  (pset [this {:keys [x y col]}]
-    (native/image_pset img-ptr x y col))
-  (pal [this {:keys [col1 col2]}]
-    (if col2
-      (native/image_pal img-ptr col1 col2)
-      (native/image_pal0 img-ptr)))
-  (clip [this {:keys [x y w h]}]
-    (if w
-      (native/image_clip img-ptr x y w h)
-      (native/image_clip0 img-ptr)))
-  (data-ptr [this]
-    (native/image_data_ptr img-ptr))
-  (data-length [this]
-    (native/image_data_length img-ptr))
-  (load [this filename]
-    (native/image_from filename 0))
-  (width [this]
-    (native/image_width img-ptr))
-  (height [this]
-    (native/image_height img-ptr))
-  )
+(defn frame-count
+  "Get current frame count"
+  []
+  (native/pyxel_frame_count))
 
-
-(defn screen []
-  "Return the screen image"
-  (ImageType. (native/pyxel_screen)))
+(defn perf_monitor
+  "Enable/disable performance monitor"
+  [enable]
+  (native/pyxel_perf_monitor (if enable 1 0)))
 
 (defn init
   "Initialize Pyxel with the given options"
@@ -118,8 +66,10 @@
   {:x (native/pyxel_mouse_x)
    :y (native/pyxel_mouse_y)})
 
+
 (comment
   (require '[dispatch-async :refer [dispatch_async_f]])
+  (require '[pyxel.image :as image])
   (defn dev-update [])
   (defn dev-draw []
     (cls screen-img {:col 1})
@@ -129,11 +79,14 @@
   (defn pyxel-draw [] (dev-draw))
   (dispatch_async_f #(init {:width 160 :height 120 :title "Hello, Pyxel"}))
   (dispatch_async_f #(native/pyxel_run pyxel-update pyxel-draw))
-  (def screen-img (screen))
+  (def screen-img (image/screen))
   (def image_2_data_ptr (data-ptr screen-img))
   (def image_2_length (data-length screen-img))
   (def image_2_raw (.reinterpret image_2_data_ptr image_2_length))
   (.getAtIndex image_2_raw java.lang.foreign.ValueLayout/JAVA_BYTE 1)
-  (.setAtIndex image_2_raw java.lang.foreign.ValueLayout/JAVA_BYTE 1 10)
+  (let [idx 1
+        val 10]
+  (.setAtIndex image_2_raw java.lang.foreign.ValueLayout/JAVA_BYTE 2 val)
+    )
   (.isReadOnly image_2_raw)
   )
