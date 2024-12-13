@@ -1,3 +1,4 @@
 [workspace]
 members =  ["pyxel-platform", "pyxel-engine", "pyxel-c-wrapper"]
+exclude =  ["pyxel-wrapper"]
 resolver = "2"
