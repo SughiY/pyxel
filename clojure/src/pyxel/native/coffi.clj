@@ -742,41 +742,9 @@
   (mem/write-byte image_2_raw 1)
 
 
-  (def image_2_ptr (mem/deserialize
-                    (mem/reinterpret image_2_data_ptr (mem/size-of [::mem/array ::mem/byte image_2_length]))
-                    [::mem/array ::mem/byte image_2_length]))
-
-  (mem/serialize-into (map #(if (= % 10) 11 %) image_2_ptr) [::mem/array ::mem/byte image_2_length] image_2_raw (mem/global-arena))
-
-  (def image_2_atom (coffi.ffi/->StaticVariable
-                     (.reinterpret ^java.lang.foreign.MemorySegment image_2_data_ptr
-                                   ^long (mem/size-of [::mem/array ::mem/byte image_2_length]))
-                     [::mem/array ::mem/byte image_2_length] (atom nil)))
-
-
-
-  (ffi/freset! image_2_atom (map #(if (= % 12) 11 %) @image_2_atom))
-
   (def image-2-data (image_data image_2))
-  (image_data_reset! image_2 (map #(if (= % 10) 11 % ) image-2-data))
+  (image_data_reset! image_2 (map #(if (= % 11) 12 % ) image-2-data))
 
-  (mem/serialize-into (map #(if (= % 10) 11 %) image-2-data)
-                      [::mem/array ::mem/byte image_2_length]
-                      (mem/reinterpret image_2_data_ptr (mem/size-of [::mem/array ::mem/byte image_2_length]))
-                      (mem/global-arena))
-
-(defn image_data_reset! [img-ptr img-data]
-  (let [data-ptr (image_data_ptr img-ptr)
-        data-length (image_data_length img-ptr)
-        data-type [::mem/array ::mem/byte data-length]]
-    (mem/serialize-into img-data
-                        data-type
-                        (mem/reinterpret data-ptr (mem/size-of data-type))
-                        (mem/global-arena))))
-
-
-  (nth image_2_ptr 0 20)
-  (type image_2_ptr)
 
   (defn dev-update [])
   (defn dev-draw []
