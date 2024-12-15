@@ -206,6 +206,23 @@
   "Get image data length"
   image_data_length [::mem/pointer] ::mem/int)
 
+(defn image_data [img-ptr]
+  (let [data-seg (image_data_ptr img-ptr)
+        data-length (image_data_length img-ptr)
+        data-type [::mem/array ::mem/byte data-length]]
+    (-> data-seg
+        (mem/reinterpret (mem/size-of data-type))
+        (mem/deserialize data-type))))
+
+(defn image_data_reset! [img-ptr img-data]
+  (let [data-ptr (image_data_ptr img-ptr)
+        data-length (image_data_length img-ptr)
+        data-type [::mem/array ::mem/byte data-length]]
+    (mem/serialize-into img-data
+                        data-type
+                        (mem/reinterpret data-ptr (mem/size-of data-type))
+                        (mem/global-arena))))
+
 (defcfn image_clip
   "Set clip area"
   image_clip [::mem/pointer ::mem/double ::mem/double ::mem/double ::mem/double] ::mem/void)
@@ -721,13 +738,52 @@
   (def image_2_data_ptr (image_data_ptr image_2))
   (def image_2_length (image_data_length image_2))
   (def image_2_raw (.reinterpret image_2_data_ptr image_2_length))
-  (.getAtIndex image_2_raw java.lang.foreign.ValueLayout/JAVA_BYTE 2)
+  (.getAtIndex image_2_raw mem/byte-layout 1)
+  (mem/write-byte image_2_raw 1)
+
+
+  (def image_2_ptr (mem/deserialize
+                    (mem/reinterpret image_2_data_ptr (mem/size-of [::mem/array ::mem/byte image_2_length]))
+                    [::mem/array ::mem/byte image_2_length]))
+
+  (mem/serialize-into (map #(if (= % 10) 11 %) image_2_ptr) [::mem/array ::mem/byte image_2_length] image_2_raw (mem/global-arena))
+
+  (def image_2_atom (coffi.ffi/->StaticVariable
+                     (.reinterpret ^java.lang.foreign.MemorySegment image_2_data_ptr
+                                   ^long (mem/size-of [::mem/array ::mem/byte image_2_length]))
+                     [::mem/array ::mem/byte image_2_length] (atom nil)))
+
+
+
+  (ffi/freset! image_2_atom (map #(if (= % 12) 11 %) @image_2_atom))
+
+  (def image-2-data (image_data image_2))
+  (image_data_reset! image_2 (map #(if (= % 10) 11 % ) image-2-data))
+
+  (mem/serialize-into (map #(if (= % 10) 11 %) image-2-data)
+                      [::mem/array ::mem/byte image_2_length]
+                      (mem/reinterpret image_2_data_ptr (mem/size-of [::mem/array ::mem/byte image_2_length]))
+                      (mem/global-arena))
+
+(defn image_data_reset! [img-ptr img-data]
+  (let [data-ptr (image_data_ptr img-ptr)
+        data-length (image_data_length img-ptr)
+        data-type [::mem/array ::mem/byte data-length]]
+    (mem/serialize-into img-data
+                        data-type
+                        (mem/reinterpret data-ptr (mem/size-of data-type))
+                        (mem/global-arena))))
+
+
+  (nth image_2_ptr 0 20)
+  (type image_2_ptr)
 
   (defn dev-update [])
   (defn dev-draw []
-    (pyxel_cls 1)
-    (pyxel_circ 260 72 30 8))
-    
+    (pyxel_cls 2)
+    (pyxel_circ 20 72 30 8)
+    (pyxel_blt_screen 0 0 image_2 0 0 8 8 -1 0 1))
+
   (image_rect image_2 0 0 3 1 5)
   (image_width image_2)
   (image_height image_2)
@@ -743,5 +799,6 @@
     (println "Running Pyxel")
     (pyxel_run pyxel-update pyxel-draw))
 
-  (dispatch_async_f run-pxyel))
+  (dispatch_async_f run-pxyel)
+  )
   

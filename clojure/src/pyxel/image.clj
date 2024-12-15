@@ -47,6 +47,10 @@
     (if w
       (native/image_clip img-ptr x y w h)
       (native/image_clip0 img-ptr)))
+  (data [this]
+    (native/image_data img-ptr))
+  (data-reset! [this d]
+    (native/image_data_reset! img-ptr d))
   (data-ptr [this]
     (native/image_data_ptr img-ptr))
   (data-length [this]

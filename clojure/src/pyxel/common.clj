@@ -23,6 +23,8 @@
   (pset [this options])
   (pal [this options])
   (clip [this options])
+  (data [this])
+  (data-reset! [this d])
   (data-ptr [this])
   (data-length [this])
   (load [this filename])
